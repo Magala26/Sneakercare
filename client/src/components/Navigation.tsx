@@ -17,7 +17,7 @@ export default function Navigation() {
   ];
 
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+    <nav className="bg-white/95 backdrop-blur-xl border-b border-blue-100 sticky top-0 z-50 shadow-[0_12px_30px_rgba(15,23,42,0.08)]">
       <div className="container flex items-center justify-between py-3">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
@@ -34,7 +34,7 @@ export default function Navigation() {
             <Link
               key={link.href}
               href={link.href}
-              className="font-bold uppercase text-sm tracking-wider text-foreground hover:text-accent transition-colors"
+              className="font-bold uppercase text-sm tracking-[0.18em] text-foreground relative after:absolute after:left-0 after:-bottom-2 after:h-0.5 after:w-0 after:bg-[#bf616a] after:transition-all hover:text-accent hover:after:w-full transition-colors"
             >
               {link.label}
             </Link>
@@ -43,7 +43,7 @@ export default function Navigation() {
 
         {/* Mobile Menu Button */}
         <button
-          className="md:hidden p-2 hover:bg-gray-100 transition-colors rounded-lg"
+          className="md:hidden p-2 hover:bg-blue-50 border border-blue-100 transition-colors rounded-xl"
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Toggle menu"
         >
@@ -53,7 +53,7 @@ export default function Navigation() {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden border-t border-gray-200 bg-white">
+        <div className="md:hidden border-t border-blue-100 bg-white/98 backdrop-blur-xl">
           <div className="container py-4 flex flex-col gap-4">
             {navLinks.map((link) => (
               <Link
@@ -69,8 +69,8 @@ export default function Navigation() {
         </div>
       )}
 
-      {/* Blue Divider */}
-      <div className="h-1 bg-gradient-to-r from-blue-500 to-blue-600 w-full" />
+      {/* Brand Divider */}
+      <div className="red-divider" />
     </nav>
   );
 }

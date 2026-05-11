@@ -40,7 +40,7 @@ const WorkGallery = () => {
             <div className="container">
                 <div className="text-center mb-16">
                     <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{
-                        background: 'linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)',
+                        background: 'linear-gradient(135deg, #0b0d12 0%, #2563eb 48%, #bf616a 100%)',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
                         backgroundClip: 'text'
@@ -94,9 +94,9 @@ export default function Home() {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-white via-blue-50 to-white py-16 md:py-32 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" />
+      <section className="bg-gradient-to-br from-white via-blue-50 to-white py-16 md:py-32 relative overflow-hidden border-b border-blue-100">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#bf616a]/20 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-pulse" />
         
         <div className="container text-center relative z-10">
           {/* Logo */}
@@ -104,20 +104,20 @@ export default function Home() {
             <img 
               src={logoUrl} 
               alt="Sneaker Care Department" 
-              className="h-32 md:h-40 w-auto mx-auto"
+              className="h-32 md:h-40 w-auto mx-auto rounded-2xl shadow-[0_20px_55px_rgba(15,23,42,0.10)]"
             />
           </div>
           
-          <div className="inline-flex items-center gap-2 mb-6 bg-blue-100 px-4 py-2 rounded-full">
+          <div className="inline-flex items-center gap-2 mb-6 bg-white border border-blue-100 px-4 py-2 rounded-full shadow-sm">
             <Sparkles size={16} className="text-accent" />
-            <span className="text-sm font-semibold text-accent uppercase">Premium Sneaker Care</span>
+            <span className="text-sm font-semibold text-accent uppercase tracking-[0.16em]">Premium Sneaker Care</span>
           </div>
           
           <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            <span className="text-foreground">Professional Sneaker</span>
+            <span className="text-foreground drop-shadow-sm">Professional Sneaker</span>
             <br />
             <span style={{
-              background: 'linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)',
+              background: 'linear-gradient(135deg, #0b0d12 0%, #2563eb 48%, #bf616a 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text'
@@ -145,11 +145,12 @@ export default function Home() {
       <div className="red-divider" />
 
       {/* Service Highlights */}
-      <section className="bg-white py-20 md:py-28" id="our-services">
+      <section className="bg-white py-20 md:py-28 relative overflow-hidden" id="our-services">
+        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-blue-50/70 to-transparent pointer-events-none" />
         <div className="container">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{
-              background: 'linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)',
+              background: 'linear-gradient(135deg, #0b0d12 0%, #2563eb 48%, #bf616a 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text'
@@ -168,15 +169,15 @@ export default function Home() {
               { name: 'Suede/Nubuck Maintenance Clean', price: 'R200', desc: "Suede and nubuck demand specialist handling. A dedicated maintenance protocol." }
             ].map((service, idx) => (
               <div key={idx} className={`card-modern flex flex-col group ${service.featured ? 'border-2 border-accent transform md:scale-105 z-10 shadow-xl' : ''}`}>
-                <div className="w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300 text-gray-400 font-semibold mb-6">
+                <div className="w-full h-48 bg-gradient-to-br from-blue-50 via-white to-[#bf616a]/10 rounded-xl flex items-center justify-center border-2 border-dashed border-blue-200 text-gray-500 font-semibold mb-6 group-hover:border-[#bf616a]/50">
                   Photo — {service.name}
                 </div>
                 <h3 className="font-bold text-xl mb-2 text-foreground">{service.name}</h3>
                 <p className="text-sm text-gray-600 mb-4 flex-grow">{service.desc}</p>
                 <div className="flex justify-between items-center pt-4 border-t border-gray-100 mb-4">
-                  <span className="text-accent font-bold text-lg">{service.price}</span>
+                  <span className="text-[#bf616a] font-black text-lg tracking-wide">{service.price}</span>
                 </div>
-                <Link href="/main-services" className={`w-full text-center py-3 px-4 rounded-lg font-bold uppercase transition-all duration-300 ${service.featured ? 'bg-gradient-to-r from-accent to-blue-600 text-white' : 'bg-transparent border-2 border-foreground text-foreground hover:bg-foreground hover:text-white'}`}>
+                <Link href="/main-services" className={`w-full text-center py-3 px-4 rounded-xl font-bold uppercase transition-all duration-300 ${service.featured ? 'bg-gradient-to-r from-[#bf616a] via-blue-600 to-[#0b0d12] text-white shadow-lg' : 'bg-white border-2 border-foreground text-foreground hover:bg-foreground hover:text-white hover:border-[#bf616a]'}`}>
                   View Details
                 </Link>
               </div>
@@ -198,27 +199,27 @@ export default function Home() {
       <div className="red-divider" />
 
       {/* Rotation Refresh Plan Teaser */}
-      <section id="rotation-refresh-preview" className="rrp-home-teaser bg-gradient-to-br from-blue-50 to-white py-20 md:py-28 overflow-hidden">
+      <section id="rotation-refresh-preview" className="rrp-home-teaser bg-gradient-to-br from-[#0b0d12] via-blue-950 to-white py-20 md:py-28 overflow-hidden text-white">
         <div className="container">
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
             {/* Left Copy */}
             <div className="w-full lg:w-1/2">
-              <div className="inline-flex items-center gap-2 mb-6 bg-blue-100 px-4 py-2 rounded-full">
+              <div className="inline-flex items-center gap-2 mb-6 bg-white border border-blue-100 px-4 py-2 rounded-full shadow-sm">
                 <Sparkles size={16} className="text-accent" />
                 <span className="text-sm font-semibold text-accent uppercase tracking-wider">Premium Sneaker Care Membership</span>
               </div>
               
-              <p className="text-xl md:text-2xl font-bold mb-3 tracking-widest uppercase" style={{ color: '#b40008' }}>
+              <p className="text-xl md:text-2xl font-bold mb-3 tracking-widest uppercase" style={{ color: '#bf616a' }}>
                 The Rotation Refresh Plan
               </p>
               
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight" style={{
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-white" style={{
                 fontFamily: '"Playfair Display", Georgia, serif'
               }}>
                 Keep every pair in your rotation looking box-fresh — every month.
               </h2>
               
-              <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+              <p className="text-lg text-white/75 mb-8 leading-relaxed">
                 Stop letting dirty sneakers kill the look, value, and confidence of your collection. Get monthly professional sneaker care built for collectors, resellers, athletes, and serious sneaker lovers who refuse to let their rotation fall off.
               </p>
               
@@ -232,7 +233,7 @@ export default function Home() {
               </div>
               
               {/* Proof Points */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-0 border border-blue-100 bg-white p-2 rounded-2xl shadow-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-0 border border-blue-200 bg-white/95 p-2 rounded-2xl shadow-sm text-foreground">
                 <div className="p-4 bg-blue-50/50 rounded-xl sm:rounded-r-none sm:rounded-l-xl">
                   <strong className="block text-foreground text-sm mb-1">Month-to-month</strong>
                   <span className="text-gray-500 text-xs">No long contract</span>
@@ -272,7 +273,7 @@ export default function Home() {
         <div className="container">
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{
-              background: 'linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)',
+              background: 'linear-gradient(135deg, #0b0d12 0%, #2563eb 48%, #bf616a 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text'
@@ -356,7 +357,7 @@ export default function Home() {
             <div className="container">
               <div className="text-center mb-12">
                 <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{
-                  background: 'linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)',
+                  background: 'linear-gradient(135deg, #0b0d12 0%, #2563eb 48%, #bf616a 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text'

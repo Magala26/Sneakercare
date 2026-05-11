@@ -10,25 +10,25 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-gradient-to-b from-white to-gray-50 border-t border-gray-200 mt-auto">
+    <footer className="bg-gradient-to-b from-white via-blue-50/40 to-[#0b0d12] border-t border-blue-100 mt-auto">
       <div className="red-divider" />
       <div className="container py-16 md:py-20">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 bg-white/90 backdrop-blur-sm border border-blue-100 rounded-3xl p-8 md:p-10 shadow-[0_24px_60px_rgba(15,23,42,0.12)]">
           {/* Brand */}
           <div>
             <img 
               src={logoUrl} 
               alt="Sneaker Care Department" 
-              className="h-20 w-auto mb-4"
+              className="h-20 w-auto mb-4 rounded-xl shadow-sm"
             />
-            <p className="text-sm text-gray-600 leading-relaxed">
+            <p className="text-sm text-gray-600 leading-relaxed border-l-4 border-[#bf616a] pl-4">
               Professional sneaker cleaning, restoration, and premium care services for your most prized collection.
             </p>
           </div>
 
           {/* Operating Hours */}
           <div>
-            <h3 className="text-lg font-bold mb-4 text-foreground">Operating Hours</h3>
+            <h3 className="text-lg font-bold mb-4 text-foreground tracking-wider">Operating Hours</h3>
             <div className="text-sm space-y-2">
               {operatingHours.map((item, idx) => (
                 <div key={idx} className="flex justify-between text-gray-600">
@@ -41,7 +41,7 @@ export default function Footer() {
 
           {/* Contact & Social */}
           <div>
-            <h3 className="text-lg font-bold mb-4 text-foreground">Contact</h3>
+            <h3 className="text-lg font-bold mb-4 text-foreground tracking-wider">Contact</h3>
             <div className="text-sm space-y-3 mb-6">
               <div className="flex items-center gap-3 text-gray-600">
                 <Mail size={18} className="text-accent flex-shrink-0" />
@@ -70,7 +70,7 @@ export default function Footer() {
                 href="https://wa.me/27665884466"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                className="p-2 bg-[#0b0d12] text-white rounded-xl hover:bg-[#bf616a] transition-colors shadow-md"
                 title="WhatsApp"
               >
                 <MessageCircle size={18} />
@@ -79,7 +79,7 @@ export default function Footer() {
                 href="https://www.instagram.com/weluvsneakercare/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
+                className="p-2 bg-[#bf616a] text-white rounded-xl hover:bg-blue-600 transition-colors shadow-md"
                 title="Instagram"
               >
                 <Instagram size={18} />
@@ -88,7 +88,7 @@ export default function Footer() {
                 href="https://www.tiktok.com/@weluvsneakercare"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+                className="p-2 bg-blue-600 text-white rounded-xl hover:bg-[#0b0d12] transition-colors shadow-md"
                 title="TikTok"
               >
                 <Music size={18} />
@@ -101,7 +101,7 @@ export default function Footer() {
         <div className="red-divider my-8" />
 
         {/* Copyright */}
-        <div className="text-center text-sm text-gray-600">
+        <div className="text-center text-sm text-white/80">
           <p>&copy; 2026 Sneaker Care Department. All rights reserved.</p>
         </div>
       </div>
