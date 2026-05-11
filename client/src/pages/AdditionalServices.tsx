@@ -1,4 +1,5 @@
 import Layout from '@/components/Layout';
+import { additionalServiceOfferImages } from '@/data/sneakercareImages';
 
 export default function AdditionalServices() {
   const addOns = [
@@ -34,6 +35,8 @@ export default function AdditionalServices() {
     }
   ];
 
+  const imageByAddOn = new Map(additionalServiceOfferImages.map((image) => [image.matchedItem, image]));
+
   return (
     <Layout>
       {/* Header */}
@@ -53,11 +56,24 @@ export default function AdditionalServices() {
       <section className="bg-white py-20 md:py-28">
         <div className="container max-w-4xl">
           <div className="flex flex-col gap-8">
-            {addOns.map((addon, idx) => (
+            {addOns.map((addon, idx) => {
+              const addOnImage = imageByAddOn.get(addon.name);
+
+              return (
               <div
                 key={idx}
-                className="bg-white border border-gray-100 rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow flex flex-col md:flex-row md:items-center gap-6"
+                className="bg-white border border-blue-100 rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-xl transition-shadow flex flex-col md:flex-row md:items-center gap-6 overflow-hidden"
               >
+                {addOnImage && (
+                  <div className="md:w-48 lg:w-56 flex-shrink-0 overflow-hidden rounded-2xl bg-blue-50 border border-blue-100 shadow-sm">
+                    <img
+                      src={addOnImage.src}
+                      alt={addOnImage.alt}
+                      className="h-72 md:h-64 w-full object-cover transition-transform duration-700 hover:scale-105"
+                      loading="lazy"
+                    />
+                  </div>
+                )}
                 <div className="flex-grow">
                   <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-3">
                     <h3 className="text-2xl font-bold text-foreground">
@@ -83,7 +99,8 @@ export default function AdditionalServices() {
                   </a>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

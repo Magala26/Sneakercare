@@ -1,5 +1,6 @@
 import Layout from '@/components/Layout';
 import { Zap } from 'lucide-react';
+import { serviceImages } from '@/data/sneakercareImages';
 
 export default function MainServices() {
   const services = [
@@ -40,6 +41,8 @@ export default function MainServices() {
     }
   ];
 
+  const imageByService = new Map(serviceImages.map((image) => [image.matchedItem, image]));
+
   return (
     <Layout>
       {/* Header */}
@@ -72,11 +75,22 @@ export default function MainServices() {
                   </div>
                 )}
                 
-                {/* Image Placeholder */}
-                <div className={`bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300 text-gray-400 font-semibold mb-6 ${
-                  service.featured ? 'h-64 lg:h-80' : 'h-48'
+                <div className={`relative overflow-hidden rounded-2xl bg-blue-50 border border-blue-100 mb-6 ${
+                  service.featured ? 'h-64 lg:h-80' : 'h-56'
                 }`}>
-                  Photo — {service.name}
+                  {imageByService.get(service.name) ? (
+                    <img
+                      src={imageByService.get(service.name)!.src}
+                      alt={imageByService.get(service.name)!.alt}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="h-full w-full flex items-center justify-center text-gray-400 font-semibold">
+                      Photo — {service.name}
+                    </div>
+                  )}
+                  <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-blue-600 via-[#bf616a] to-[#0b0d12]" />
                 </div>
 
                 <div className="flex-grow flex flex-col">

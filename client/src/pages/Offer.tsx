@@ -1,8 +1,11 @@
 import Layout from '@/components/Layout';
 import '../offer.css';
 import rotationSneakerUrl from '@/assets/rotation-sneaker.png';
+import { subscriptionOfferImages } from '@/data/sneakercareImages';
 
 export default function Offer() {
+  const subscriptionPoster = subscriptionOfferImages[0];
+
   return (
     <Layout>
       <section className="rrp-offer-page" id="rotation-refresh-plan">
@@ -184,6 +187,12 @@ export default function Offer() {
               sneaker-care package instead of a once-off cleaning service.
             </p>
           </div>
+
+          {subscriptionPoster && (
+            <div className="rrp-offer-poster">
+              <img src={subscriptionPoster.src} alt={subscriptionPoster.alt} loading="lazy" />
+            </div>
+          )}
 
           <div className="rrp-bonus-grid">
             <div className="rrp-bonus-card">

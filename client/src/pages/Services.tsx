@@ -2,9 +2,19 @@ import { Link } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import Layout from '@/components/Layout';
 import { Zap, Award } from 'lucide-react';
+import { serviceImages } from '@/data/sneakercareImages';
 
 export default function Services() {
   const { data: services = [], isLoading } = trpc.sneaker.services.list.useQuery();
+  const fallbackServices = [
+    { id: 1, name: 'Standard Clean', description: 'A focused refresh for everyday pairs, covering the upper, mid sole, and laces.', price: 10000 },
+    { id: 2, name: 'The 95 Deluxe', description: 'Our full reset service for pairs that need complete attention across the upper, sole, laces, inner sole, deodorizing, and protector application.', price: 22000 },
+    { id: 3, name: 'Deep Clean', description: 'A deeper care session for inset stains, inner sole buildup, and daily wear that needs more than a standard clean.', price: 12000 },
+    { id: 4, name: 'Intense Deep Clean', description: 'Maximum effort for neglected pairs that need intensified upper cleaning and deeper detail work.', price: 24000 },
+    { id: 5, name: 'Suede/Nubuck Maintenance Clean', description: 'Specialist care for suede and nubuck materials using a dedicated maintenance approach.', price: 20000 },
+  ];
+  const displayServices = services.length > 0 ? services : fallbackServices;
+  const imageByService = new Map(serviceImages.map((image) => [image.matchedItem, image]));
 
   return (
     <Layout>
@@ -26,9 +36,12 @@ export default function Services() {
         <div className="container">
           {isLoading ? (
             <p className="text-center text-gray-600">Loading services...</p>
-          ) : services.length > 0 ? (
+          ) : displayServices.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {services.map((service, idx) => (
+              {displayServices.map((service, idx) => {
+                const serviceImage = imageByService.get(service.name);
+
+                return (
                 <div
                   key={service.id}
                   className="card-modern group relative overflow-hidden"
@@ -40,9 +53,20 @@ export default function Services() {
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   
                   <div className="relative z-10">
-                    {/* Service Icon */}
-                    <div className="mb-6 h-16 w-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-2xl group-hover:scale-110 transition-transform duration-300">
-                      {service.name.charAt(0)}
+                    <div className="relative mb-6 h-64 overflow-hidden rounded-2xl border border-blue-100 bg-blue-50 shadow-sm">
+                      {serviceImage ? (
+                        <img
+                          src={serviceImage.src}
+                          alt={serviceImage.alt}
+                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-blue-400 to-blue-600 text-white font-bold text-5xl">
+                          {service.name.charAt(0)}
+                        </div>
+                      )}
+                      <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-blue-600 via-[#bf616a] to-[#0b0d12]" />
                     </div>
 
                     {/* Service Name */}
@@ -74,7 +98,8 @@ export default function Services() {
                     </Link>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <p className="text-center text-gray-600">No services available</p>

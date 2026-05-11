@@ -4,6 +4,7 @@ import Layout from '@/components/Layout';
 import { toast } from 'sonner';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { Upload, X } from 'lucide-react';
+import { galleryImages as uploadedGalleryImages } from '@/data/sneakercareImages';
 
 export default function Gallery() {
   const { user } = useAuth();
@@ -71,11 +72,7 @@ export default function Gallery() {
     }
   };
 
-  // Generate 10 placeholder images for the static gallery
-  const staticPlaceholders = Array.from({ length: 10 }).map((_, i) => ({
-    id: i,
-    imageUrl: `https://placehold.co/800x800/f8fafc/334155?text=Sneaker+Image+${i + 1}`,
-  }));
+  const staticGalleryImages = uploadedGalleryImages;
 
   return (
     <Layout>
@@ -101,18 +98,20 @@ export default function Gallery() {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
-            {staticPlaceholders.map((image) => (
-              <div key={image.id} className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm hover:shadow-xl transition-all duration-300">
-                <div className="aspect-square overflow-hidden bg-gray-100">
+            {staticGalleryImages.map((image) => (
+              <div key={image.id} className="group relative overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm hover:shadow-xl transition-all duration-300">
+                <div className="aspect-[4/5] overflow-hidden bg-blue-50">
                   <img 
-                    src={image.imageUrl} 
-                    alt={`Gallery Image ${image.id + 1}`}
+                    src={image.src} 
+                    alt={image.alt}
                     className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out"
+                    loading="lazy"
                   />
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                  <p className="text-white font-bold uppercase tracking-wider text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Sneaker Care</p>
-                  <p className="text-white/80 text-xs">Premium Service</p>
+                <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-blue-600 via-[#bf616a] to-[#0b0d12]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                  <p className="text-white font-bold uppercase tracking-wider text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">{image.caption}</p>
+                  <p className="text-white/80 text-xs capitalize">{image.category.replace('-', ' ')}</p>
                 </div>
               </div>
             ))}

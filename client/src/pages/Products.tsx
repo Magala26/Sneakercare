@@ -1,5 +1,6 @@
 import Layout from '@/components/Layout';
 import { CheckCircle2 } from 'lucide-react';
+import { productOfferImages } from '@/data/sneakercareImages';
 
 export default function Products() {
   const products = [
@@ -104,6 +105,8 @@ export default function Products() {
     }
   ];
 
+  const imageByProduct = new Map(productOfferImages.map((image) => [image.matchedItem, image]));
+
   return (
     <Layout>
       {/* Header */}
@@ -123,11 +126,24 @@ export default function Products() {
       <section className="bg-gray-50 py-20 md:py-28">
         <div className="container">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.map((product, idx) => (
+            {products.map((product, idx) => {
+              const productImage = imageByProduct.get(product.name);
+
+              return (
               <div key={idx} className="card-modern flex flex-col h-full bg-white group hover:shadow-xl transition-all duration-300">
-                {/* 1:1 Image Placeholder */}
-                <div className="w-full aspect-square bg-gray-100 rounded-t-lg flex items-center justify-center border-b-2 border-gray-100 text-gray-400 font-semibold mb-6 group-hover:bg-gray-50 transition-colors">
-                  Product Photo — {product.name.replace(/ \d+ml$/, '').replace(/ \d+pk$/, '')}
+                <div className="w-full aspect-[4/5] bg-blue-50 rounded-t-xl overflow-hidden border-b-2 border-blue-100 mb-6">
+                  {productImage ? (
+                    <img
+                      src={productImage.src}
+                      alt={productImage.alt}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="h-full w-full flex items-center justify-center text-gray-400 font-semibold text-center px-6">
+                      Product Photo — {product.name.replace(/ \d+ml$/, '').replace(/ \d+pk$/, '')}
+                    </div>
+                  )}
                 </div>
                 
                 <div className="flex-grow flex flex-col px-2 pb-2">
@@ -178,7 +194,8 @@ export default function Products() {
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
