@@ -19,6 +19,11 @@ import img18 from '@/assets/sneakercare-uploads/18-products-page-sneaker-protect
 import img19 from '@/assets/sneakercare-uploads/19-additional-services-page-nano-coating.webp';
 import img20 from '@/assets/sneakercare-uploads/20-products-page-sneaker-wipes.webp';
 import img21 from '@/assets/sneakercare-uploads/21-rotation-refresh-offer-page-rotation-refresh-plan.webp';
+import img22 from '@/assets/sneakercare-uploads/22-homepage-services-standard-clean.webp';
+import img23 from '@/assets/sneakercare-uploads/23-homepage-services-the-95-deluxe.webp';
+import img24 from '@/assets/sneakercare-uploads/24-homepage-services-deep-clean.webp';
+import img25 from '@/assets/sneakercare-uploads/25-homepage-services-intense-deep-clean.webp';
+import img26 from '@/assets/sneakercare-uploads/26-homepage-services-suede-nubuck-maintenance.webp';
 
 export type SneakercareImage = {
   id: string;
@@ -46,11 +51,11 @@ export const workImages: SneakercareImage[] = [
 ];
 
 export const serviceImages: SneakercareImage[] = [
-  { id: 'service-standard-clean', src: img01, alt: 'Clean sneaker display for Standard Clean service', caption: 'Standard Clean', category: 'work', matchedItem: 'Standard Clean' },
-  { id: 'service-the-95-deluxe', src: img02, alt: 'Detailed sneaker finish for The 95 Deluxe service', caption: 'The 95 Deluxe', category: 'work', matchedItem: 'The 95 Deluxe' },
-  { id: 'service-deep-clean', src: img08, alt: 'Material preparation process for Deep Clean service', caption: 'Deep Clean', category: 'work', matchedItem: 'Deep Clean' },
-  { id: 'service-intense-deep-clean', src: img04, alt: 'Hands-on sneaker restoration process for Intense Deep Clean service', caption: 'Intense Deep Clean', category: 'work', matchedItem: 'Intense Deep Clean' },
-  { id: 'service-suede-nubuck', src: img12, alt: 'Finished sneaker detail for Suede and Nubuck Maintenance Clean service', caption: 'Suede/Nubuck Maintenance Clean', category: 'work', matchedItem: 'Suede/Nubuck Maintenance Clean' },
+  { id: 'service-standard-clean', src: img22, alt: 'Yellow leather paint application for Standard Clean service', caption: 'Standard Clean', category: 'work', matchedItem: 'Standard Clean' },
+  { id: 'service-the-95-deluxe', src: img23, alt: 'Sneaker restoration with yellow accent for The 95 Deluxe service', caption: 'The 95 Deluxe', category: 'work', matchedItem: 'The 95 Deluxe' },
+  { id: 'service-deep-clean', src: img24, alt: 'Premium sneaker detail for Deep Clean service', caption: 'Deep Clean', category: 'work', matchedItem: 'Deep Clean' },
+  { id: 'service-intense-deep-clean', src: img25, alt: 'Sneaker wings emblem detail for Intense Deep Clean service', caption: 'Intense Deep Clean', category: 'work', matchedItem: 'Intense Deep Clean' },
+  { id: 'service-suede-nubuck', src: img26, alt: 'Suede cleaning tools for Suede and Nubuck Maintenance Clean service', caption: 'Suede/Nubuck Maintenance Clean', category: 'work', matchedItem: 'Suede/Nubuck Maintenance Clean' },
 ];
 
 export const productOfferImages: SneakercareImage[] = [

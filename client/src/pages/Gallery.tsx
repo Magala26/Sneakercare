@@ -179,45 +179,7 @@ export default function Gallery() {
         </section>
       )}
 
-      {isAdmin && <div className="red-divider" />}
 
-      {/* Standard Gallery Grid (Legacy) */}
-      <section className="bg-background py-16 md:py-24">
-        <div className="container">
-          <h2 className="text-3xl font-bold uppercase mb-8">Single Shots</h2>
-          {galleryImages.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {galleryImages.map((image) => (
-                <div key={image.id} className="border-2 border-foreground overflow-hidden group relative">
-                  <img
-                    src={image.fileUrl}
-                    alt={image.caption || 'Gallery image'}
-                    className="w-full h-64 object-cover"
-                  />
-                  <div className="bg-background p-4">
-                    {image.caption && <p className="font-bold uppercase">{image.caption}</p>}
-                  </div>
-
-                  {isAdmin && (
-                    <button
-                      onClick={() => handleDelete(image.id)}
-                      disabled={deleteImage.isPending}
-                      className="absolute top-2 right-2 bg-accent text-background p-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                      style={{ opacity: deleteImage.isPending ? 0.5 : undefined }}
-                    >
-                      <X size={20} />
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-16">
-              <p className="text-lg text-muted">No single images yet.</p>
-            </div>
-          )}
-        </div>
-      </section>
     </Layout>
   );
 }

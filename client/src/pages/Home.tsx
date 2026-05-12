@@ -3,7 +3,7 @@ import { trpc } from '@/lib/trpc';
 import Layout from '@/components/Layout';
 import { Sparkles } from 'lucide-react';
 import InstagramReelsSlider from '@/components/InstagramReelsSlider';
-import { workImages } from '@/data/sneakercareImages';
+import { workImages, serviceImages } from '@/data/sneakercareImages';
 import logoUrl from '@/assets/logo.jpg';
 import rotationSneakerUrl from '@/assets/rotation-sneaker.png';
 
@@ -146,15 +146,15 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { name: 'Standard Clean', price: 'R100', desc: 'For pairs that just need a refresh. We handle the upper, mid sole, and laces.' },
-              { name: 'The 95 Deluxe', price: 'R220', desc: 'Our signature service. Nothing is left behind. The full reset your pair has been waiting for.', featured: true },
-              { name: 'Deep Clean', price: 'R120', desc: "When a standard clean isn't enough. We go into the inset stains and inner sole." },
-              { name: 'Intense Deep Clean', price: 'R240', desc: 'Maximum effort for maximum neglect. An intensified upper clean that goes further.' },
-              { name: 'Suede/Nubuck Maintenance Clean', price: 'R200', desc: "Suede and nubuck demand specialist handling. A dedicated maintenance protocol." }
+              { name: 'Standard Clean', price: 'R100', desc: 'For pairs that just need a refresh. We handle the upper, mid sole, and laces.', image: serviceImages[0] },
+              { name: 'The 95 Deluxe', price: 'R220', desc: 'Our signature service. Nothing is left behind. The full reset your pair has been waiting for.', featured: true, image: serviceImages[1] },
+              { name: 'Deep Clean', price: 'R120', desc: "When a standard clean isn't enough. We go into the inset stains and inner sole.", image: serviceImages[2] },
+              { name: 'Intense Deep Clean', price: 'R240', desc: 'Maximum effort for maximum neglect. An intensified upper clean that goes further.', image: serviceImages[3] },
+              { name: 'Suede/Nubuck Maintenance Clean', price: 'R200', desc: "Suede and nubuck demand specialist handling. A dedicated maintenance protocol.", image: serviceImages[4] }
             ].map((service, idx) => (
               <div key={idx} className={`card-modern flex flex-col group ${service.featured ? 'border-2 border-accent transform md:scale-105 z-10 shadow-xl' : ''}`}>
-                <div className="w-full h-48 bg-gradient-to-br from-blue-50 via-white to-[#bf616a]/10 rounded-xl flex items-center justify-center border-2 border-dashed border-blue-200 text-gray-500 font-semibold mb-6 group-hover:border-[#bf616a]/50">
-                  Photo — {service.name}
+                <div className="w-full h-48 bg-gradient-to-br from-blue-50 via-white to-[#bf616a]/10 rounded-xl flex items-center justify-center border-2 border-dashed border-blue-200 text-gray-500 font-semibold mb-6 group-hover:border-[#bf616a]/50 overflow-hidden">
+                  <img src={service.image.src} alt={service.image.alt} className="w-full h-full object-cover" />
                 </div>
                 <h3 className="font-bold text-xl mb-2 text-foreground">{service.name}</h3>
                 <p className="text-sm text-gray-600 mb-4 flex-grow">{service.desc}</p>
