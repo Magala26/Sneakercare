@@ -72,9 +72,6 @@ export const subscriptionOfferImages: SneakercareImage[] = [
 
 export const galleryImages: SneakercareImage[] = [
   ...workImages,
-  ...productOfferImages,
-  ...additionalServiceOfferImages,
-  ...subscriptionOfferImages,
 ];
 
 export const homepageSliderImages = workImages;
