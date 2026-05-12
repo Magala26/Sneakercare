@@ -3,7 +3,7 @@ import { trpc } from '@/lib/trpc';
 import Layout from '@/components/Layout';
 import { Sparkles } from 'lucide-react';
 import InstagramReelsSlider from '@/components/InstagramReelsSlider';
-import { workImages, serviceImages } from '@/data/sneakercareImages';
+import { workImages, serviceImages, subscriptionOfferImages } from '@/data/sneakercareImages';
 import logoUrl from '@/assets/logo.jpg';
 import rotationSneakerUrl from '@/assets/rotation-sneaker.png';
 
@@ -237,7 +237,7 @@ export default function Home() {
             <div className="w-full lg:w-1/2">
               <div className="relative w-full rounded-[2rem] overflow-hidden shadow-2xl min-h-[400px] md:min-h-[500px] group border border-blue-100">
                 <img 
-                  src={rotationSneakerUrl} 
+                  src={subscriptionOfferImages[1]?.src || rotationSneakerUrl} 
                   alt="The Rotation Refresh Plan Premium Sneaker Care"
                   className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                 />

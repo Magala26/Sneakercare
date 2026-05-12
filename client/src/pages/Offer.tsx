@@ -54,10 +54,10 @@ export default function Offer() {
             <div className="rrp-product-stage">
               <div className="rrp-product-glow"></div>
 
-              {/* Local image only. Replace this with your own local cut-out sneaker PNG. */}
+              {/* Premium offer poster image */}
               <img
                 className="rrp-sneaker-img"
-                src={rotationSneakerUrl}
+                src={subscriptionOfferImages[1]?.src || rotationSneakerUrl}
                 alt="Premium sneaker product visual"
               />
 

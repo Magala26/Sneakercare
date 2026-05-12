@@ -24,6 +24,7 @@ import img23 from '@/assets/sneakercare-uploads/23-homepage-services-the-95-delu
 import img24 from '@/assets/sneakercare-uploads/24-homepage-services-deep-clean.webp';
 import img25 from '@/assets/sneakercare-uploads/25-homepage-services-intense-deep-clean.webp';
 import img26 from '@/assets/sneakercare-uploads/26-homepage-services-suede-nubuck-maintenance.webp';
+import img27 from '@/assets/sneakercare-uploads/27-rotation-refresh-plan-offer-poster.webp';
 
 export type SneakercareImage = {
   id: string;
@@ -73,6 +74,7 @@ export const additionalServiceOfferImages: SneakercareImage[] = [
 
 export const subscriptionOfferImages: SneakercareImage[] = [
   { id: 'subscription-rotation-refresh-plan', src: img21, alt: 'Monthly subscription Rotation Refresh Plan offer poster', caption: 'Rotation Refresh Plan', category: 'subscription-offer', matchedItem: 'Rotation Refresh Plan' },
+  { id: 'subscription-rotation-refresh-plan-premium', src: img27, alt: 'Premium Sneaker Care Monthly Subscription offer poster', caption: 'Premium Monthly Subscription', category: 'subscription-offer', matchedItem: 'Premium Monthly Subscription' },
 ];
 
 export const galleryImages: SneakercareImage[] = [
