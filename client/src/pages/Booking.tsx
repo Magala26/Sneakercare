@@ -13,13 +13,19 @@ import { Calendar } from "@/components/ui/calendar";
 
 const BOOKING_INTERVAL_MINUTES = 30;
 
+// Strict booking rules
+const BOOKING_RULES = {
+  closedDays: [0], // 0 = Sunday
+  saturdayHours: { open: 9, close: 15.5 }, // 9:00 - 3:30 PM
+  weekdayHours: { open: 9, close: 17 }, // 9:00 - 5:00 PM
+};
+
 export default function Booking() {
   const { data: services = [] } = trpc.sneaker.services.list.useQuery();
-  const { data: operatingHours = [] } = trpc.sneaker.operatingHours.list.useQuery();
   const createBooking = trpc.sneaker.bookings.create.useMutation();
 
   const [formData, setFormData] = useState({
-    selectedService: null as number | null,
+    selectedService: '' as string,
     customerName: '',
     customerEmail: '',
     customerPhone: '',
@@ -32,24 +38,31 @@ export default function Booking() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string>('');
 
-  // Generate available time slots based on operating hours
+  // Generate available time slots based on strict booking rules
   const availableTimeSlots = useMemo(() => {
-    if (!selectedDate || operatingHours.length === 0) return [];
+    if (!selectedDate) return [];
 
     const dayOfWeek = selectedDate.getDay();
-    const dayHours = operatingHours.find((h) => h.day === dayOfWeek);
+    
+    // Check if closed (Sunday)
+    if (BOOKING_RULES.closedDays.includes(dayOfWeek)) return [];
 
-    if (!dayHours || dayHours.isClosed) return [];
+    // Determine hours based on day
+    let openHour: number, closeHour: number;
+    if (dayOfWeek === 6) { // Saturday
+      openHour = BOOKING_RULES.saturdayHours.open;
+      closeHour = Math.floor(BOOKING_RULES.saturdayHours.close);
+    } else { // Monday-Friday
+      openHour = BOOKING_RULES.weekdayHours.open;
+      closeHour = BOOKING_RULES.weekdayHours.close;
+    }
 
     const slots = [];
-    const [openHour, openMin] = dayHours.openTime.split(':').map(Number);
-    const [closeHour, closeMin] = dayHours.closeTime.split(':').map(Number);
-
     let currentHour = openHour;
-    let currentMin = openMin;
-    const closeTimeInMinutes = closeHour * 60 + closeMin;
+    let currentMin = 0;
+    const closeTimeInMinutes = closeHour * 60;
 
-    while (currentHour * 60 + currentMin <= closeTimeInMinutes) {
+    while (currentHour * 60 + currentMin < closeTimeInMinutes) {
       const timeStr = `${String(currentHour).padStart(2, '0')}:${String(currentMin).padStart(2, '0')}`;
       slots.push(timeStr);
       currentMin += BOOKING_INTERVAL_MINUTES;
@@ -60,13 +73,14 @@ export default function Booking() {
     }
 
     return slots;
-  }, [selectedDate, operatingHours]);
+  }, [selectedDate]);
 
   const handleDateChange = (date: Date | undefined) => {
     setSelectedDate(date);
+    setSelectedTime(''); // Reset time when date changes
     if (date) {
       const dateStr = date.toISOString().split('T')[0];
-      setFormData({ ...formData, bookingDate: dateStr });
+      setFormData({ ...formData, bookingDate: dateStr, bookingTime: '' });
     }
   };
 
@@ -81,8 +95,7 @@ export default function Booking() {
   };
 
   const handleServiceChange = (value: string) => {
-    const serviceId = value ? Number(value) : null;
-    setFormData({ ...formData, selectedService: serviceId });
+    setFormData({ ...formData, selectedService: value });
   };
 
   const handleCallTypeChange = (value: string) => {
@@ -102,18 +115,36 @@ export default function Booking() {
       return;
     }
 
-    // Check operating hours restriction
-    const dayOfWeek = selectedDate?.getDay();
-    const dayHours = operatingHours.find((h) => h.day === dayOfWeek);
-    if (dayHours && dayHours.isClosed) {
-      toast.error('We are closed on the selected day');
+    // Validate booking date is at least 1 day in advance
+    const bookingDate = new Date(formData.bookingDate);
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    bookingDate.setHours(0, 0, 0, 0);
+
+    if (bookingDate < tomorrow) {
+      toast.error('Bookings must be made at least 1 day in advance');
+      return;
+    }
+
+    // Validate day is not Sunday
+    const dayOfWeek = bookingDate.getDay();
+    if (BOOKING_RULES.closedDays.includes(dayOfWeek)) {
+      toast.error('We are closed on Sundays');
       return;
     }
 
     try {
-      const service = services.find(s => s.id === formData.selectedService);
+      const serviceId = Number(formData.selectedService);
+      const service = services.find(s => s.id === serviceId);
+      
+      if (!service) {
+        toast.error('Selected service not found');
+        return;
+      }
+
       const result = await createBooking.mutateAsync({
-        serviceId: formData.selectedService,
+        serviceId: serviceId,
         customerName: formData.customerName,
         customerEmail: formData.customerEmail,
         customerPhone: formData.customerPhone,
@@ -125,7 +156,7 @@ export default function Booking() {
       toast.success('Booking created successfully! Redirecting to checkout...');
       
       // Construct WhatsApp message for the user to send as well
-      const whatsappMsg = `Hi Sneaker Care Department, I've just made a booking!\n\nService: ${service?.name}\nDate: ${formData.bookingDate}\nTime: ${formData.bookingTime}\nType: ${formData.callType.toUpperCase()}\nName: ${formData.customerName}`;
+      const whatsappMsg = `Hi Sneaker Care Department, I've just made a booking!\n\nService: ${service.name}\nDate: ${formData.bookingDate}\nTime: ${formData.bookingTime}\nType: ${formData.callType.toUpperCase()}\nName: ${formData.customerName}`;
       const whatsappUrl = `https://wa.me/27665884466?text=${encodeURIComponent(whatsappMsg)}`;
 
       setTimeout(() => {
@@ -137,10 +168,11 @@ export default function Booking() {
     }
   };
 
+  // Calculate min date (tomorrow)
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  const minDate = tomorrow;
 
+  // Calculate max date (30 days from now)
   const maxDate = new Date();
   maxDate.setDate(maxDate.getDate() + 30);
 
@@ -161,16 +193,22 @@ export default function Booking() {
             {/* Service Selection */}
             <div>
               <label className="block font-bold uppercase mb-3 text-foreground">Select Service *</label>
-              <Select value={formData.selectedService?.toString() || ''} onValueChange={handleServiceChange}>
-                <SelectTrigger className="w-full border-2 border-foreground h-12 font-bold">
+              <Select value={formData.selectedService} onValueChange={handleServiceChange}>
+                <SelectTrigger className="w-full border-2 border-foreground h-12 font-bold text-foreground bg-white">
                   <SelectValue placeholder="-- Choose a service --" />
                 </SelectTrigger>
                 <SelectContent>
-                  {services.map((service) => (
-                    <SelectItem key={service.id} value={service.id.toString()}>
-                      {service.name} - R {(service.price / 100).toFixed(2)}
+                  {services && services.length > 0 ? (
+                    services.map((service) => (
+                      <SelectItem key={service.id} value={String(service.id)}>
+                        {service.name} - R {(service.price / 100).toFixed(2)}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-services" disabled>
+                      No services available
                     </SelectItem>
-                  ))}
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -179,7 +217,7 @@ export default function Booking() {
             <div>
               <label className="block font-bold uppercase mb-3 text-foreground">Booking Type *</label>
               <Select value={formData.callType} onValueChange={handleCallTypeChange}>
-                <SelectTrigger className="w-full border-2 border-foreground h-12 font-bold">
+                <SelectTrigger className="w-full border-2 border-foreground h-12 font-bold text-foreground bg-white">
                   <SelectValue placeholder="Select booking type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -198,8 +236,12 @@ export default function Booking() {
                   selected={selectedDate}
                   onSelect={handleDateChange}
                   disabled={(date) => {
-                    if (minDate && date < minDate) return true;
-                    if (maxDate && date > maxDate) return true;
+                    // Disable Sundays
+                    if (date.getDay() === 0) return true;
+                    // Disable dates before tomorrow
+                    if (date < tomorrow) return true;
+                    // Disable dates more than 30 days away
+                    if (date > maxDate) return true;
                     return false;
                   }}
                   className="mx-auto"
@@ -208,42 +250,29 @@ export default function Booking() {
             </div>
 
             {/* Time Selection */}
-            <div>
-              <label className="block font-bold uppercase mb-3 text-foreground">Select Time *</label>
-              <Select value={selectedTime} onValueChange={handleTimeChange}>
-                <SelectTrigger className="w-full border-2 border-foreground h-12 font-bold">
-                  <SelectValue placeholder="-- Choose a time --" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableTimeSlots.length > 0 ? (
-                    availableTimeSlots.map((slot) => (
-                      <SelectItem key={slot} value={slot}>
-                        {slot}
+            {selectedDate && (
+              <div>
+                <label className="block font-bold uppercase mb-3 text-foreground">Select Time *</label>
+                <Select value={selectedTime} onValueChange={handleTimeChange}>
+                  <SelectTrigger className="w-full border-2 border-foreground h-12 font-bold text-foreground bg-white">
+                    <SelectValue placeholder="-- Choose a time --" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableTimeSlots.length > 0 ? (
+                      availableTimeSlots.map((slot) => (
+                        <SelectItem key={slot} value={slot}>
+                          {slot}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="no-slots" disabled>
+                        No available times
                       </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem value="no-slots" disabled>
-                      No available times
-                    </SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Operating Hours Info */}
-            <div className="card-modern border-l-4 border-accent">
-              <h3 className="font-bold text-foreground mb-4">Operating Hours</h3>
-              <div className="text-sm space-y-2">
-                {operatingHours.map((oh) => (
-                  <div key={oh.id} className="flex justify-between text-gray-600">
-                    <span className="font-semibold">{oh.dayName}:</span>
-                    <span className="text-accent font-semibold">
-                      {oh.isClosed ? 'Closed' : `${oh.openTime} - ${oh.closeTime}`}
-                    </span>
-                  </div>
-                ))}
+                    )}
+                  </SelectContent>
+                </Select>
               </div>
-            </div>
+            )}
 
             {/* Customer Information */}
             <div>
