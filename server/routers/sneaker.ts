@@ -15,6 +15,7 @@ import {
   createTestimonial,
 } from "../db";
 import { notifyOwner } from "../_core/notification";
+import { sendWhatsAppMessage } from "../_core/whatsapp";
 import { storagePut } from "../storage";
 
 const phoneRegex = /^[\d\s\-\+\(\)]{10,20}$/;
@@ -74,7 +75,7 @@ export const sneakerRouter = router({
         // Get the booking ID from the result
         const bookingId = (result as any).insertId || result;
 
-        // Notify owner
+        // Notify owner via Manus notification service
         try {
           const callType = input.specialRequests?.includes("OUTCALL") ? "OUT-CALL" : "IN-CALL";
           await notifyOwner({
@@ -83,6 +84,18 @@ export const sneakerRouter = router({
           });
         } catch (error) {
           console.error("Failed to send owner notification:", error);
+        }
+
+        // Send WhatsApp message to owner
+        try {
+          const callType = input.specialRequests?.includes("OUTCALL") ? "OUT-CALL" : "IN-CALL";
+          const whatsappMessage = `New Booking Received\n\nCustomer: ${input.customerName}\nService: ${service.name}\nType: ${callType}\nDate: ${input.bookingDate}\nTime: ${input.bookingTime}\nPhone: ${input.customerPhone}\nEmail: ${input.customerEmail}`;
+          await sendWhatsAppMessage({
+            to: "0665884466",
+            message: whatsappMessage,
+          });
+        } catch (error) {
+          console.error("Failed to send WhatsApp notification:", error);
         }
 
         return { success: true, bookingId };
