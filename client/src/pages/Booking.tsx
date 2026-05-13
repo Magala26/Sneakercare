@@ -27,6 +27,11 @@ const SERVICES = [
   { id: 3, name: 'Deep Clean', price: 12000 }, // R120
   { id: 4, name: 'Intense Deep Clean', price: 24000 }, // R240
   { id: 5, name: 'Suede/Nubuck Maintenance & Clean', price: 20000 }, // R200
+  { id: 6, name: 'Sole Whitening', price: 15000 }, // R150
+  { id: 7, name: 'Sneaker Customizations', price: 30000 }, // R300
+  { id: 8, name: 'Colour Restoration', price: 25000 }, // R250
+  { id: 9, name: 'Sneaker Protection', price: 18000 }, // R180
+  { id: 10, name: 'Nano Coating', price: 28000 }, // R280
 ];
 
 export default function Booking() {
