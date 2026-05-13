@@ -79,6 +79,14 @@ export default function Home() {
     <Layout>
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-white via-blue-50 to-white py-16 md:py-32 relative overflow-hidden border-b border-blue-100">
+        {/* Logo Background - subtle and mobile optimized */}
+        <div 
+          className="absolute inset-0 opacity-5 md:opacity-8 pointer-events-none bg-center bg-contain bg-no-repeat"
+          style={{
+            backgroundImage: `url('${logoUrl}')`,
+          }}
+        />
+        
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#bf616a]/20 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-pulse" />
         
@@ -207,42 +215,25 @@ export default function Home() {
                 Stop letting dirty sneakers kill the look, value, and confidence of your collection. Get monthly professional sneaker care built for collectors, resellers, athletes, and serious sneaker lovers who refuse to let their rotation fall off.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4 mb-10">
-                <Link href="/rotation-refresh-plan" className="btn-primary flex-1 sm:flex-none text-center inline-block">
-                  View The Full Offer
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link href="/rotation-refresh-plan" className="btn-primary inline-block text-center">
+                  Explore The Plan
                 </Link>
-                <a href="https://wa.me/27665884466" className="btn-outline flex-1 sm:flex-none text-center inline-block">
+                <a href="https://wa.me/27665884466" className="btn-outline inline-block text-center">
                   Ask On WhatsApp
                 </a>
               </div>
-              
-              {/* Proof Points */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-0 border border-blue-200 bg-white/95 p-2 rounded-2xl shadow-sm text-foreground">
-                <div className="p-4 bg-blue-50/50 rounded-xl sm:rounded-r-none sm:rounded-l-xl">
-                  <strong className="block text-foreground text-sm mb-1">Month-to-month</strong>
-                  <span className="text-gray-500 text-xs">No long contract</span>
-                </div>
-                <div className="p-4 bg-blue-50/50 border-t sm:border-t-0 sm:border-l border-white">
-                  <strong className="block text-foreground text-sm mb-1">From R1499</strong>
-                  <span className="text-gray-500 text-xs">Built for real rotations</span>
-                </div>
-                <div className="p-4 bg-blue-50/50 rounded-xl sm:rounded-l-none sm:rounded-r-xl border-t sm:border-t-0 sm:border-l border-white">
-                  <strong className="block text-foreground text-sm mb-1">Bonus included</strong>
-                  <span className="text-gray-500 text-xs">Free gift on sign-up</span>
-                </div>
-              </div>
             </div>
-            
+
             {/* Right Visual */}
-            <div className="w-full lg:w-1/2">
-              <div className="relative w-full rounded-[2rem] overflow-hidden shadow-2xl min-h-[400px] md:min-h-[500px] group border border-blue-100">
+            <div className="w-full lg:w-1/2 flex justify-center">
+              <div className="relative w-full max-w-md">
+                <div className="absolute inset-0 bg-gradient-to-r from-[#bf616a]/20 to-blue-500/20 rounded-3xl blur-2xl" />
                 <img 
-                  src={subscriptionOfferImages[1]?.src || rotationSneakerUrl} 
-                  alt="The Rotation Refresh Plan Premium Sneaker Care"
-                  className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                  src={subscriptionOfferImages[1]?.src || rotationSneakerUrl}
+                  alt="Rotation Refresh Plan"
+                  className="relative w-full h-auto rounded-2xl shadow-2xl"
                 />
-                {/* Soft overlay to make it look premium and blend slightly */}
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent pointer-events-none" />
               </div>
             </div>
           </div>
@@ -252,79 +243,40 @@ export default function Home() {
       {/* Blue Divider */}
       <div className="red-divider" />
 
-      {/* Price List Summary */}
-      <section className="bg-gradient-to-br from-blue-50 to-white py-20 md:py-28">
+      {/* Work Gallery */}
+      <WorkGallery />
+
+      {/* Blue Divider */}
+      <div className="red-divider" />
+
+      {/* Testimonials Section */}
+      <section className="bg-gradient-to-br from-blue-50 via-white to-[#bf616a]/5 py-20 md:py-28">
         <div className="container">
-          <div className="text-center mb-12">
+          <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{
               background: 'linear-gradient(135deg, #0b0d12 0%, #2563eb 48%, #bf616a 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text'
             }}>
-              Pricing Guide
+              What Our Clients Say
             </h2>
-            <p className="text-gray-600 text-lg">Explore our service and product ranges</p>
+            <p className="text-gray-600 text-lg">Real feedback from sneaker enthusiasts and collectors</p>
           </div>
-          
-          <div className="max-w-3xl mx-auto flex flex-col gap-4">
-            {[
-              {
-                title: 'Sneaker Cleaning',
-                priceRange: services.length > 0 
-                  ? `R${Math.min(...services.map(s => s.price / 100))} - R${Math.max(...services.map(s => s.price / 100))}`
-                  : 'R100 - R240',
-                link: '/services',
-                linkText: 'View All Cleaning Services'
-              },
-              {
-                title: 'Sneaker Products',
-                priceRange: 'R60 - R180',
-                link: '/products',
-                linkText: 'Shop Products'
-              },
-              {
-                title: 'Additional Services',
-                priceRange: 'R50 - R500',
-                link: '/additional-services',
-                linkText: 'View Additional Services'
-              },
-              {
-                title: 'Special Offer',
-                priceRange: 'From R1499 / month',
-                link: '/rotation-refresh-plan',
-                linkText: 'View Subscription'
-              }
-            ].map((pkg, idx) => {
-              const isOdd = (idx + 1) % 2 !== 0;
-              return (
-                <div 
-                  key={idx} 
-                  className={`flex flex-col md:flex-row items-center justify-between p-4 md:p-5 rounded-3xl md:rounded-full transition-transform hover:scale-[1.02] duration-300 shadow-md ${
-                    isOdd 
-                      ? 'bg-blue-600 text-white border-2 border-blue-600' 
-                      : 'bg-white text-blue-600 border-2 border-blue-600'
-                  }`}
-                >
-                  <div className="text-center md:text-left mb-4 md:mb-0 md:ml-4">
-                    <h3 className="text-xl md:text-2xl font-bold mb-1">{pkg.title}</h3>
-                    <p className={`text-base font-semibold tracking-wide ${isOdd ? 'text-blue-100' : 'text-blue-500'}`}>
-                      {pkg.priceRange}
-                    </p>
-                  </div>
-                  <Link 
-                    href={pkg.link} 
-                    className={`px-5 py-2.5 rounded-full font-bold uppercase text-xs transition-colors whitespace-nowrap md:mr-4 shadow-sm ${
-                      isOdd 
-                        ? 'bg-white text-blue-600 hover:bg-gray-100' 
-                        : 'bg-blue-600 text-white hover:bg-blue-700'
-                    }`}
-                  >
-                    {pkg.linkText}
-                  </Link>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.slice(0, 3).map((testimonial, idx) => (
+              <div key={idx} className="card-modern">
+                <div className="flex items-center gap-1 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <span key={i} className="text-[#bf616a] text-lg">★</span>
+                  ))}
                 </div>
-              );
-            })}
+                <p className="text-gray-600 mb-4 leading-relaxed">{testimonial.content}</p>
+                <p className="font-bold text-foreground">{testimonial.customerName}</p>
+                <p className="text-sm text-muted">{testimonial.customerEmail}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -332,53 +284,42 @@ export default function Home() {
       {/* Blue Divider */}
       <div className="red-divider" />
 
-
-
-      {false && (
-        <>
-          {/* Instagram Reels Testimonials */}
-          <section className="bg-white py-20 md:py-28 overflow-hidden">
-            <div className="container">
-              <div className="text-center mb-12">
-                <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{
-                  background: 'linear-gradient(135deg, #0b0d12 0%, #2563eb 48%, #bf616a 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text'
-                }}>
-                  Watch Us Work
-                </h2>
-                <p className="text-gray-600 text-lg">See our incredible sneaker transformations in action</p>
-              </div>
-              
-              <div className="-mx-4 md:mx-0">
-                <InstagramReelsSlider />
-              </div>
-            </div>
-          </section>
-
-          {/* Blue Divider */}
-          <div className="red-divider" />
-        </>
-      )}
-
-      {/* Our Work Section */}
-      <WorkGallery />
+      {/* Instagram Reels */}
+      <section className="bg-white py-20 md:py-28">
+        <div className="container">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{
+              background: 'linear-gradient(135deg, #0b0d12 0%, #2563eb 48%, #bf616a 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>
+              Follow Our Journey
+            </h2>
+            <p className="text-gray-600 text-lg">See our latest sneaker transformations on Instagram</p>
+          </div>
+          <InstagramReelsSlider />
+        </div>
+      </section>
 
       {/* Blue Divider */}
       <div className="red-divider" />
 
-      {/* CTA Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 py-20 md:py-28 text-center text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full mix-blend-multiply filter blur-3xl opacity-10" />
-        <div className="container relative z-10">
+      {/* Final CTA */}
+      <section className="bg-gradient-to-r from-[#bf616a] via-blue-600 to-[#0b0d12] py-20 md:py-28 text-white text-center">
+        <div className="container max-w-2xl">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Refresh Your Kicks?</h2>
-          <p className="text-lg md:text-xl mb-10 max-w-2xl mx-auto opacity-90">
-            Join hundreds of sneaker enthusiasts who trust us with their prized collections.
+          <p className="text-lg mb-10 text-white/90">
+            Join hundreds of sneaker enthusiasts who trust us with their most prized collections.
           </p>
-          <Link href="/booking" className="inline-block bg-white text-blue-600 px-8 py-4 font-bold uppercase rounded-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-            Schedule Your Clean
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/booking" className="btn-primary inline-block text-center">
+              Book Your Clean Today
+            </Link>
+            <Link href="/rotation-refresh-plan" className="inline-block bg-white text-[#bf616a] px-8 py-4 font-bold uppercase rounded-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+              Explore Membership
+            </Link>
+          </div>
         </div>
       </section>
     </Layout>

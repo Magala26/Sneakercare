@@ -3,6 +3,7 @@ import { trpc } from '@/lib/trpc';
 import Layout from '@/components/Layout';
 import { toast } from 'sonner';
 import { X } from 'lucide-react';
+import { CalendarWithTime } from '@/components/CalendarWithTime';
 
 const BOOKING_INTERVAL_MINUTES = 30;
 
@@ -12,7 +13,7 @@ export default function Booking() {
   const createBooking = trpc.sneaker.bookings.create.useMutation();
 
   const [formData, setFormData] = useState({
-    selectedServices: [] as number[],
+    selectedService: null as number | null,
     customerName: '',
     customerEmail: '',
     customerPhone: '',
@@ -21,7 +22,9 @@ export default function Booking() {
     specialRequests: '',
   });
 
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [selectedStartTime, setSelectedStartTime] = useState<string>('10:00');
+  const [selectedEndTime, setSelectedEndTime] = useState<string>('12:00');
 
   // Generate available time slots
   const availableTimeSlots = useMemo(() => {
@@ -53,10 +56,12 @@ export default function Booking() {
     return slots;
   }, [selectedDate, operatingHours]);
 
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const date = new Date(e.target.value);
+  const handleDateChange = (date: Date | undefined) => {
     setSelectedDate(date);
-    setFormData({ ...formData, bookingDate: e.target.value });
+    if (date) {
+      const dateStr = date.toISOString().split('T')[0];
+      setFormData({ ...formData, bookingDate: dateStr });
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -64,23 +69,21 @@ export default function Booking() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleServiceToggle = (serviceId: number) => {
-    setFormData((prev) => {
-      const isSelected = prev.selectedServices.includes(serviceId);
-      return {
-        ...prev,
-        selectedServices: isSelected
-          ? prev.selectedServices.filter((id) => id !== serviceId)
-          : [...prev.selectedServices, serviceId],
-      };
-    });
+  const handleServiceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const serviceId = e.target.value ? Number(e.target.value) : null;
+    setFormData({ ...formData, selectedService: serviceId });
+  };
+
+  const handleStartTimeChange = (time: string) => {
+    setSelectedStartTime(time);
+    setFormData({ ...formData, bookingTime: time });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (formData.selectedServices.length === 0) {
-      toast.error('Please select at least one service');
+    if (!formData.selectedService) {
+      toast.error('Please select a service');
       return;
     }
 
@@ -90,45 +93,38 @@ export default function Booking() {
     }
 
     try {
-      // Create a booking for each selected service
-      const bookingIds: number[] = [];
-      for (const serviceId of formData.selectedServices) {
-        const result = await createBooking.mutateAsync({
-          serviceId,
-          customerName: formData.customerName,
-          customerEmail: formData.customerEmail,
-          customerPhone: formData.customerPhone,
-          bookingDate: formData.bookingDate,
-          bookingTime: formData.bookingTime,
-          specialRequests: formData.specialRequests || undefined,
-        });
-        bookingIds.push(result.bookingId);
-      }
+      const result = await createBooking.mutateAsync({
+        serviceId: formData.selectedService,
+        customerName: formData.customerName,
+        customerEmail: formData.customerEmail,
+        customerPhone: formData.customerPhone,
+        bookingDate: formData.bookingDate,
+        bookingTime: formData.bookingTime,
+        specialRequests: formData.specialRequests || undefined,
+      });
 
-      toast.success('Bookings created successfully! Redirecting to checkout...');
+      toast.success('Booking created successfully! Redirecting to checkout...');
       setTimeout(() => {
-        window.location.href = `/checkout?bookingIds=${bookingIds.join(',')}`;
+        window.location.href = `/checkout?bookingIds=${result.bookingId}`;
       }, 1500);
     } catch (error: any) {
       toast.error(error.message || 'Failed to create booking');
     }
   };
 
-  // Calculate total price for selected services
-  const totalPrice = formData.selectedServices.reduce((sum, serviceId) => {
-    const service = services.find((s) => s.id === serviceId);
-    return sum + (service?.price || 0);
-  }, 0);
+  // Get selected service details
+  const selectedServiceData = formData.selectedService
+    ? services.find((s) => s.id === formData.selectedService)
+    : null;
 
   // Get tomorrow's date as minimum
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  const minDate = tomorrow.toISOString().split('T')[0];
+  const minDate = tomorrow;
 
   // Get date 30 days from now as maximum
   const maxDate = new Date();
   maxDate.setDate(maxDate.getDate() + 30);
-  const maxDateStr = maxDate.toISOString().split('T')[0];
 
   return (
     <Layout>
@@ -149,65 +145,39 @@ export default function Booking() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Form */}
             <form onSubmit={handleSubmit} className="md:col-span-2 space-y-6">
-              {/* Service Selection */}
+              {/* Service Selection Dropdown */}
               <div>
-                <label className="block font-bold uppercase mb-3">Select Services *</label>
-                <p className="text-sm text-muted mb-3">You can select multiple services</p>
-                <div className="space-y-2">
-                  {services.map((service) => (
-                    <label key={service.id} className="flex items-center gap-3 p-3 border-2 border-foreground cursor-pointer hover:bg-muted transition-colors">
-                      <input
-                        type="checkbox"
-                        checked={formData.selectedServices.includes(service.id)}
-                        onChange={() => handleServiceToggle(service.id)}
-                        className="w-4 h-4 cursor-pointer"
-                      />
-                      <div className="flex-1">
-                        <p className="font-bold">{service.name}</p>
-                        <p className="text-sm text-muted">{service.duration} min</p>
-                      </div>
-                      <p className="font-bold text-accent">R {(service.price / 100).toFixed(2)}</p>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Date Selection */}
-              <div>
-                <label className="block font-bold uppercase mb-3">Booking Date *</label>
-                <input
-                  type="date"
-                  name="bookingDate"
-                  value={formData.bookingDate}
-                  onChange={handleDateChange}
-                  min={minDate}
-                  max={maxDateStr}
+                <label className="block font-bold uppercase mb-3">Select Service *</label>
+                <p className="text-sm text-muted mb-3">Choose from our available services</p>
+                <select
+                  name="selectedService"
+                  value={formData.selectedService || ''}
+                  onChange={handleServiceChange}
                   className="w-full border-2 border-foreground bg-background p-3 font-bold"
                   required
-                />
+                >
+                  <option value="">-- Choose a service --</option>
+                  {services.map((service) => (
+                    <option key={service.id} value={service.id}>
+                      {service.name} - R {(service.price / 100).toFixed(2)} ({service.duration} min)
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              {/* Time Selection */}
+              {/* Calendar and Time Selection */}
               <div>
-                <label className="block font-bold uppercase mb-3">Booking Time *</label>
-                {availableTimeSlots.length > 0 ? (
-                  <select
-                    name="bookingTime"
-                    value={formData.bookingTime}
-                    onChange={handleInputChange}
-                    className="w-full border-2 border-foreground bg-background p-3 font-bold"
-                    required
-                  >
-                    <option value="">Choose a time...</option>
-                    {availableTimeSlots.map((time) => (
-                      <option key={time} value={time}>
-                        {time}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <p className="text-muted">Please select a date to see available times</p>
-                )}
+                <label className="block font-bold uppercase mb-3">Select Date & Time *</label>
+                <CalendarWithTime
+                  selectedDate={selectedDate}
+                  onDateChange={handleDateChange}
+                  selectedStartTime={selectedStartTime}
+                  onStartTimeChange={handleStartTimeChange}
+                  selectedEndTime={selectedEndTime}
+                  onEndTimeChange={setSelectedEndTime}
+                  minDate={minDate}
+                  maxDate={maxDate}
+                />
               </div>
 
               {/* Operating Hours Info */}
@@ -295,21 +265,16 @@ export default function Booking() {
               <div className="border-2 border-foreground p-6 sticky top-32">
                 <h3 className="font-bold uppercase mb-6">Booking Summary</h3>
 
-                {formData.selectedServices.length > 0 ? (
+                {selectedServiceData ? (
                   <>
                     <div className="space-y-3 mb-6 pb-6 border-b-2 border-muted">
-                      {formData.selectedServices.map((serviceId) => {
-                        const service = services.find((s) => s.id === serviceId);
-                        return (
-                          <div key={serviceId} className="flex justify-between items-start gap-2">
-                            <div className="flex-1">
-                              <p className="font-bold text-sm">{service?.name}</p>
-                              <p className="text-xs text-muted">{service?.duration} min</p>
-                            </div>
-                            <p className="font-bold text-accent">R {((service?.price || 0) / 100).toFixed(2)}</p>
-                          </div>
-                        );
-                      })}
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="flex-1">
+                          <p className="font-bold text-sm">{selectedServiceData.name}</p>
+                          <p className="text-xs text-muted">{selectedServiceData.duration} min</p>
+                        </div>
+                        <p className="font-bold text-accent">R {((selectedServiceData.price || 0) / 100).toFixed(2)}</p>
+                      </div>
                     </div>
 
                     <div className="space-y-2 mb-6 pb-6 border-b-2 border-muted">
@@ -323,11 +288,11 @@ export default function Booking() {
 
                     <div className="flex justify-between items-center">
                       <p className="font-bold uppercase">Total</p>
-                      <p className="text-2xl font-bold text-accent">R {(totalPrice / 100).toFixed(2)}</p>
+                      <p className="text-2xl font-bold text-accent">R {((selectedServiceData.price || 0) / 100).toFixed(2)}</p>
                     </div>
                   </>
                 ) : (
-                  <p className="text-muted text-sm">Select services to see summary</p>
+                  <p className="text-muted text-sm">Select a service to see summary</p>
                 )}
               </div>
             </div>
