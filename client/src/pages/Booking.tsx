@@ -20,8 +20,16 @@ const BOOKING_RULES = {
   weekdayHours: { open: 9, close: 17 }, // 9:00 - 5:00 PM
 };
 
+// Hardcoded services
+const SERVICES = [
+  { id: 1, name: 'Standard Clean', price: 10000 }, // R100
+  { id: 2, name: 'The 95 Deluxe', price: 22000 }, // R220
+  { id: 3, name: 'Deep Clean', price: 12000 }, // R120
+  { id: 4, name: 'Intense Deep Clean', price: 24000 }, // R240
+  { id: 5, name: 'Suede/Nubuck Maintenance & Clean', price: 20000 }, // R200
+];
+
 export default function Booking() {
-  const { data: services = [] } = trpc.sneaker.services.list.useQuery();
   const createBooking = trpc.sneaker.bookings.create.useMutation();
 
   const [formData, setFormData] = useState({
@@ -136,7 +144,7 @@ export default function Booking() {
 
     try {
       const serviceId = Number(formData.selectedService);
-      const service = services.find(s => s.id === serviceId);
+      const service = SERVICES.find(s => s.id === serviceId);
       
       if (!service) {
         toast.error('Selected service not found');
@@ -198,17 +206,11 @@ export default function Booking() {
                   <SelectValue placeholder="-- Choose a service --" />
                 </SelectTrigger>
                 <SelectContent>
-                  {services && services.length > 0 ? (
-                    services.map((service) => (
-                      <SelectItem key={service.id} value={String(service.id)}>
-                        {service.name} - R {(service.price / 100).toFixed(2)}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem value="no-services" disabled>
-                      No services available
+                  {SERVICES.map((service) => (
+                    <SelectItem key={service.id} value={String(service.id)}>
+                      {service.name} - R {(service.price / 100).toFixed(2)}
                     </SelectItem>
-                  )}
+                  ))}
                 </SelectContent>
               </Select>
             </div>
