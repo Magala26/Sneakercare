@@ -51,15 +51,16 @@ export default function Offer() {
           </div>
 
           <div className="rrp-hero__visual" aria-label="Sneaker care subscription product visual">
-            <div className="rrp-product-stage">
+            <div 
+              className="rrp-product-stage"
+              style={{
+                backgroundImage: `url('${subscriptionOfferImages[1]?.src || rotationSneakerUrl}')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+              }}
+            >
               <div className="rrp-product-glow"></div>
-
-              {/* Premium offer poster image */}
-              <img
-                className="rrp-sneaker-img"
-                src={subscriptionOfferImages[1]?.src || rotationSneakerUrl}
-                alt="Premium sneaker product visual"
-              />
 
               <div className="rrp-floating-card rrp-floating-card--top">
                 <span>Starter Plan</span>
@@ -189,15 +190,8 @@ export default function Offer() {
           </div>
 
           {subscriptionPoster && (
-            <div 
-              className="rrp-offer-poster"
-              style={{
-                backgroundImage: `url('${subscriptionPoster.src}')`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
-              }}
-            >
+            <div className="rrp-offer-poster">
+              <img src={subscriptionPoster.src} alt={subscriptionPoster.alt} loading="lazy" />
             </div>
           )}
 
