@@ -73,15 +73,14 @@ const WorkGallery = () => {
 
 export default function Home() {
   const { data: services = [], isLoading } = trpc.sneaker.services.list.useQuery();
-  const { data: testimonials = [] } = trpc.sneaker.testimonials.list.useQuery();
 
   return (
     <Layout>
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-white via-blue-50 to-white py-16 md:py-32 relative overflow-hidden border-b border-blue-100">
-        {/* Logo Background - subtle and mobile optimized */}
+        {/* Logo Background - darker at 20% opacity */}
         <div 
-          className="absolute inset-0 opacity-10 md:opacity-15 pointer-events-none bg-center bg-contain bg-no-repeat"
+          className="absolute inset-0 opacity-20 md:opacity-20 pointer-events-none bg-center bg-contain bg-no-repeat"
           style={{
             backgroundImage: `url('${logoUrl}')`,
           }}
@@ -91,8 +90,6 @@ export default function Home() {
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#bf616a]/20 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-pulse" />
         
         <div className="container text-center relative z-10">
-          {/* Foreground Logo Removed as requested */}
-          
           <div className="inline-flex items-center gap-2 mb-6 bg-white border border-blue-100 px-4 py-2 rounded-full shadow-sm">
             <Sparkles size={16} className="text-accent" />
             <span className="text-sm font-semibold text-accent uppercase tracking-[0.16em]">Premium Sneaker Care</span>
@@ -238,41 +235,6 @@ export default function Home() {
 
       {/* Work Gallery */}
       <WorkGallery />
-
-      {/* Blue Divider */}
-      <div className="red-divider" />
-
-      {/* Testimonials Section */}
-      <section className="bg-gradient-to-br from-blue-50 via-white to-[#bf616a]/5 py-20 md:py-28">
-        <div className="container">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{
-              background: 'linear-gradient(135deg, #0b0d12 0%, #2563eb 48%, #bf616a 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
-            }}>
-              What Our Clients Say
-            </h2>
-            <p className="text-gray-600 text-lg">Real feedback from sneaker enthusiasts and collectors</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.slice(0, 3).map((testimonial, idx) => (
-              <div key={idx} className="card-modern">
-                <div className="flex items-center gap-1 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <span key={i} className="text-[#bf616a] text-lg">★</span>
-                  ))}
-                </div>
-                <p className="text-gray-600 mb-4 leading-relaxed">{testimonial.content}</p>
-                <p className="font-bold text-foreground">{testimonial.customerName}</p>
-                <p className="text-sm text-muted">{testimonial.customerEmail}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Blue Divider */}
       <div className="red-divider" />

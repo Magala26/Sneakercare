@@ -162,6 +162,7 @@
   text-align: center;
   text-transform: uppercase;
   transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  color: var(--rrp-white) !important;
 }
 
 .rrp-btn:hover {
@@ -178,7 +179,7 @@
 .rrp-btn--secondary {
   background: var(--rrp-white);
   border-color: var(--rrp-ink);
-  color: var(--rrp-ink);
+  color: var(--rrp-ink) !important;
 }
 
 .rrp-btn--dark {
@@ -193,7 +194,7 @@
 
 .rrp-btn--light {
   background: var(--rrp-white);
-  color: var(--rrp-blue-dark);
+  color: var(--rrp-blue-dark) !important;
   box-shadow: 0 20px 42px rgba(0, 0, 0, 0.12);
 }
 
