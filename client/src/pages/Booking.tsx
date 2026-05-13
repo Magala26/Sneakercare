@@ -1,9 +1,15 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { trpc } from '@/lib/trpc';
 import Layout from '@/components/Layout';
 import { toast } from 'sonner';
-import { X } from 'lucide-react';
 import { CalendarWithTime } from '@/components/CalendarWithTime';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const BOOKING_INTERVAL_MINUTES = 30;
 
@@ -19,14 +25,16 @@ export default function Booking() {
     customerPhone: '',
     bookingDate: '',
     bookingTime: '',
+    bookingEndTime: '',
+    callType: 'incall' as 'incall' | 'outcall',
     specialRequests: '',
   });
 
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [selectedStartTime, setSelectedStartTime] = useState<string>('10:00');
-  const [selectedEndTime, setSelectedEndTime] = useState<string>('12:00');
+  const [selectedStartTime, setSelectedStartTime] = useState<string>('');
+  const [selectedEndTime, setSelectedEndTime] = useState<string>('');
 
-  // Generate available time slots
+  // Generate available time slots based on operating hours
   const availableTimeSlots = useMemo(() => {
     if (!selectedDate || operatingHours.length === 0) return [];
 
@@ -43,7 +51,7 @@ export default function Booking() {
     let currentMin = openMin;
     const closeTimeInMinutes = closeHour * 60 + closeMin;
 
-    while (currentHour * 60 + currentMin < closeTimeInMinutes) {
+    while (currentHour * 60 + currentMin <= closeTimeInMinutes) {
       const timeStr = `${String(currentHour).padStart(2, '0')}:${String(currentMin).padStart(2, '0')}`;
       slots.push(timeStr);
       currentMin += BOOKING_INTERVAL_MINUTES;
@@ -56,6 +64,29 @@ export default function Booking() {
     return slots;
   }, [selectedDate, operatingHours]);
 
+  // Update end time automatically when start time or call type changes
+  useEffect(() => {
+    if (selectedStartTime) {
+      const [hours, mins] = selectedStartTime.split(':').map(Number);
+      let durationMinutes = 30; // Default duration
+
+      if (formData.callType === 'outcall') {
+        durationMinutes = 60; // Out-call is 1 hour long
+      } else if (formData.selectedService) {
+        const service = services.find(s => s.id === formData.selectedService);
+        if (service) durationMinutes = service.duration;
+      }
+
+      const totalMins = hours * 60 + mins + durationMinutes;
+      const endHours = Math.floor(totalMins / 60);
+      const endMins = totalMins % 60;
+      const endTimeStr = `${String(endHours).padStart(2, '0')}:${String(endMins).padStart(2, '0')}`;
+      
+      setSelectedEndTime(endTimeStr);
+      setFormData(prev => ({ ...prev, bookingTime: selectedStartTime, bookingEndTime: endTimeStr }));
+    }
+  }, [selectedStartTime, formData.callType, formData.selectedService, services]);
+
   const handleDateChange = (date: Date | undefined) => {
     setSelectedDate(date);
     if (date) {
@@ -64,19 +95,18 @@ export default function Booking() {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleServiceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const serviceId = e.target.value ? Number(e.target.value) : null;
+  const handleServiceChange = (value: string) => {
+    const serviceId = value ? Number(value) : null;
     setFormData({ ...formData, selectedService: serviceId });
   };
 
-  const handleStartTimeChange = (time: string) => {
-    setSelectedStartTime(time);
-    setFormData({ ...formData, bookingTime: time });
+  const handleCallTypeChange = (value: string) => {
+    setFormData({ ...formData, callType: value as 'incall' | 'outcall' });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -92,7 +122,16 @@ export default function Booking() {
       return;
     }
 
+    // Check operating hours restriction
+    const dayOfWeek = selectedDate?.getDay();
+    const dayHours = operatingHours.find((h) => h.day === dayOfWeek);
+    if (dayHours && dayHours.isClosed) {
+      toast.error('We are closed on the selected day');
+      return;
+    }
+
     try {
+      const service = services.find(s => s.id === formData.selectedService);
       const result = await createBooking.mutateAsync({
         serviceId: formData.selectedService,
         customerName: formData.customerName,
@@ -100,11 +139,20 @@ export default function Booking() {
         customerPhone: formData.customerPhone,
         bookingDate: formData.bookingDate,
         bookingTime: formData.bookingTime,
-        specialRequests: formData.specialRequests || undefined,
+        specialRequests: `${formData.callType.toUpperCase()} BOOKING. ${formData.specialRequests || ''}`,
       });
 
+      // WhatsApp Notification Logic (Simulated via notification service which alerts owner)
+      // The server-side already calls notifyOwner which can be configured to alert via WhatsApp/SMS
+      
       toast.success('Booking created successfully! Redirecting to checkout...');
+      
+      // Construct WhatsApp message for the user to send as well
+      const whatsappMsg = `Hi Sneaker Care Department, I've just made a booking!\n\nService: ${service?.name}\nDate: ${formData.bookingDate}\nTime: ${formData.bookingTime}\nType: ${formData.callType.toUpperCase()}\nName: ${formData.customerName}`;
+      const whatsappUrl = `https://wa.me/27665884466?text=${encodeURIComponent(whatsappMsg)}`;
+
       setTimeout(() => {
+        window.open(whatsappUrl, '_blank');
         window.location.href = `/checkout?bookingIds=${result.bookingId}`;
       }, 1500);
     } catch (error: any) {
@@ -112,23 +160,19 @@ export default function Booking() {
     }
   };
 
-  // Get selected service details
   const selectedServiceData = formData.selectedService
     ? services.find((s) => s.id === formData.selectedService)
     : null;
 
-  // Get tomorrow's date as minimum
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const minDate = tomorrow;
 
-  // Get date 30 days from now as maximum
   const maxDate = new Date();
   maxDate.setDate(maxDate.getDate() + 30);
 
   return (
     <Layout>
-      {/* Header */}
       <section className="bg-background py-12 md:py-16">
         <div className="container">
           <h1 className="text-4xl md:text-5xl font-bold uppercase mb-4">Book Your Service</h1>
@@ -136,69 +180,75 @@ export default function Booking() {
         </div>
       </section>
 
-      {/* Red Divider */}
       <div className="red-divider" />
 
-      {/* Booking Form */}
       <section className="bg-background py-16 md:py-24">
         <div className="container max-w-4xl">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Form */}
             <form onSubmit={handleSubmit} className="md:col-span-2 space-y-6">
-              {/* Service Selection Dropdown */}
               <div>
                 <label className="block font-bold uppercase mb-3">Select Service *</label>
-                <p className="text-sm text-muted mb-3">Choose from our available services</p>
-                <select
-                  name="selectedService"
-                  value={formData.selectedService || ''}
-                  onChange={handleServiceChange}
-                  className="w-full border-2 border-foreground bg-background p-3 font-bold"
-                  required
-                >
-                  <option value="">-- Choose a service --</option>
-                  {services.map((service) => (
-                    <option key={service.id} value={service.id}>
-                      {service.name} - R {(service.price / 100).toFixed(2)} ({service.duration} min)
-                    </option>
-                  ))}
-                </select>
+                <Select value={formData.selectedService?.toString() || ''} onValueChange={handleServiceChange}>
+                  <SelectTrigger className="w-full border-2 border-foreground h-12 font-bold">
+                    <SelectValue placeholder="-- Choose a service --" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {services.map((service) => (
+                      <SelectItem key={service.id} value={service.id.toString()}>
+                        {service.name} - R {(service.price / 100).toFixed(2)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              {/* Calendar and Time Selection */}
+              <div>
+                <label className="block font-bold uppercase mb-3">Booking Type *</label>
+                <Select value={formData.callType} onValueChange={handleCallTypeChange}>
+                  <SelectTrigger className="w-full border-2 border-foreground h-12 font-bold">
+                    <SelectValue placeholder="Select booking type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="incall">In-call (At our studio)</SelectItem>
+                    <SelectItem value="outcall">Out-call (We come to you - 1hr duration)</SelectItem>
+                  </SelectContent>
+                </Select>
+                {formData.callType === 'outcall' && (
+                  <p className="text-xs text-accent mt-2 font-bold uppercase tracking-wider">
+                    * Out-call bookings include travel time and are set to 1 hour duration.
+                  </p>
+                )}
+              </div>
+
               <div>
                 <label className="block font-bold uppercase mb-3">Select Date & Time *</label>
                 <CalendarWithTime
                   selectedDate={selectedDate}
                   onDateChange={handleDateChange}
                   selectedStartTime={selectedStartTime}
-                  onStartTimeChange={handleStartTimeChange}
+                  onStartTimeChange={setSelectedStartTime}
                   selectedEndTime={selectedEndTime}
                   onEndTimeChange={setSelectedEndTime}
                   minDate={minDate}
                   maxDate={maxDate}
+                  availableTimeSlots={availableTimeSlots}
                 />
               </div>
 
-              {/* Operating Hours Info */}
               <div className="card-modern border-l-4 border-accent">
                 <h3 className="font-bold text-foreground mb-4">Operating Hours</h3>
                 <div className="text-sm space-y-2">
-                  {[
-                    { day: 'Monday - Friday', hours: '9:00 AM - 5:00 PM' },
-                    { day: 'Saturday', hours: '9:00 AM - 3:00 PM' },
-                    { day: 'Sunday', hours: 'Closed' },
-                    { day: 'Public Holidays', hours: '9:00 AM - 1:00 PM' },
-                  ].map((item, idx) => (
-                    <div key={idx} className="flex justify-between text-gray-600">
-                      <span className="font-semibold">{item.day}:</span>
-                      <span className="text-accent font-semibold">{item.hours}</span>
+                  {operatingHours.map((oh) => (
+                    <div key={oh.id} className="flex justify-between text-gray-600">
+                      <span className="font-semibold">{oh.dayName}:</span>
+                      <span className="text-accent font-semibold">
+                        {oh.isClosed ? 'Closed' : `${oh.openTime} - ${oh.closeTime}`}
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Customer Information */}
               <div>
                 <label className="block font-bold uppercase mb-3">Full Name *</label>
                 <input
@@ -207,7 +257,7 @@ export default function Booking() {
                   value={formData.customerName}
                   onChange={handleInputChange}
                   placeholder="Your full name"
-                  className="w-full border-2 border-foreground bg-background p-3"
+                  className="w-full border-2 border-foreground bg-background p-3 font-bold"
                   required
                 />
               </div>
@@ -220,7 +270,7 @@ export default function Booking() {
                   value={formData.customerEmail}
                   onChange={handleInputChange}
                   placeholder="your@email.com"
-                  className="w-full border-2 border-foreground bg-background p-3"
+                  className="w-full border-2 border-foreground bg-background p-3 font-bold"
                   required
                 />
               </div>
@@ -233,12 +283,11 @@ export default function Booking() {
                   value={formData.customerPhone}
                   onChange={handleInputChange}
                   placeholder="+27 (123) 456-7890"
-                  className="w-full border-2 border-foreground bg-background p-3"
+                  className="w-full border-2 border-foreground bg-background p-3 font-bold"
                   required
                 />
               </div>
 
-              {/* Special Requests */}
               <div>
                 <label className="block font-bold uppercase mb-3">Special Requests</label>
                 <textarea
@@ -246,11 +295,10 @@ export default function Booking() {
                   value={formData.specialRequests}
                   onChange={handleInputChange}
                   placeholder="Any special instructions or concerns?"
-                  className="w-full border-2 border-foreground bg-background p-3 min-h-24"
+                  className="w-full border-2 border-foreground bg-background p-3 min-h-24 font-bold"
                 />
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={createBooking.isPending}
@@ -260,10 +308,9 @@ export default function Booking() {
               </button>
             </form>
 
-            {/* Booking Summary Sidebar */}
             <div className="md:col-span-1">
-              <div className="border-2 border-foreground p-6 sticky top-32">
-                <h3 className="font-bold uppercase mb-6">Booking Summary</h3>
+              <div className="border-2 border-foreground p-6 sticky top-32 bg-white shadow-xl rounded-xl">
+                <h3 className="font-bold uppercase mb-6 border-b-2 border-foreground pb-2">Booking Summary</h3>
 
                 {selectedServiceData ? (
                   <>
@@ -271,7 +318,7 @@ export default function Booking() {
                       <div className="flex justify-between items-start gap-2">
                         <div className="flex-1">
                           <p className="font-bold text-sm">{selectedServiceData.name}</p>
-                          <p className="text-xs text-muted">{selectedServiceData.duration} min</p>
+                          <p className="text-xs text-muted">Type: {formData.callType.toUpperCase()}</p>
                         </div>
                         <p className="font-bold text-accent">R {((selectedServiceData.price || 0) / 100).toFixed(2)}</p>
                       </div>
@@ -282,7 +329,7 @@ export default function Booking() {
                         <strong>Date:</strong> {formData.bookingDate || 'Not selected'}
                       </p>
                       <p className="text-sm">
-                        <strong>Time:</strong> {formData.bookingTime || 'Not selected'}
+                        <strong>Time:</strong> {formData.bookingTime ? `${formData.bookingTime} - ${formData.bookingEndTime}` : 'Not selected'}
                       </p>
                     </div>
 

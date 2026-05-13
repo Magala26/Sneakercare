@@ -81,7 +81,7 @@ export default function Home() {
       <section className="bg-gradient-to-br from-white via-blue-50 to-white py-16 md:py-32 relative overflow-hidden border-b border-blue-100">
         {/* Logo Background - subtle and mobile optimized */}
         <div 
-          className="absolute inset-0 opacity-5 md:opacity-8 pointer-events-none bg-center bg-contain bg-no-repeat"
+          className="absolute inset-0 opacity-10 md:opacity-15 pointer-events-none bg-center bg-contain bg-no-repeat"
           style={{
             backgroundImage: `url('${logoUrl}')`,
           }}
@@ -91,14 +91,7 @@ export default function Home() {
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#bf616a]/20 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-pulse" />
         
         <div className="container text-center relative z-10">
-          {/* Logo */}
-          <div className="mb-8">
-            <img 
-              src={logoUrl} 
-              alt="Sneaker Care Department" 
-              className="h-32 md:h-40 w-auto mx-auto rounded-2xl shadow-[0_20px_55px_rgba(15,23,42,0.10)]"
-            />
-          </div>
+          {/* Foreground Logo Removed as requested */}
           
           <div className="inline-flex items-center gap-2 mb-6 bg-white border border-blue-100 px-4 py-2 rounded-full shadow-sm">
             <Sparkles size={16} className="text-accent" />

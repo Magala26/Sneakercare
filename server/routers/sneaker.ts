@@ -76,9 +76,10 @@ export const sneakerRouter = router({
 
         // Notify owner
         try {
+          const callType = input.specialRequests?.includes("OUTCALL") ? "OUT-CALL" : "IN-CALL";
           await notifyOwner({
             title: "New Booking Received",
-            content: `New booking from ${input.customerName}\nService: ${service.name}\nDate: ${input.bookingDate}\nTime: ${input.bookingTime}\nEmail: ${input.customerEmail}\nPhone: ${input.customerPhone}`,
+            content: `New booking from ${input.customerName}\nService: ${service.name}\nType: ${callType}\nDate: ${input.bookingDate}\nTime: ${input.bookingTime}\nEmail: ${input.customerEmail}\nPhone: ${input.customerPhone}\nSpecial Requests: ${input.specialRequests || 'None'}`,
           });
         } catch (error) {
           console.error("Failed to send owner notification:", error);

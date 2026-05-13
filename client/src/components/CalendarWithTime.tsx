@@ -11,6 +11,13 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 interface CalendarWithTimeProps {
   selectedDate: Date | undefined;
@@ -21,6 +28,7 @@ interface CalendarWithTimeProps {
   onEndTimeChange: (time: string) => void;
   minDate?: Date;
   maxDate?: Date;
+  availableTimeSlots: string[];
 }
 
 export function CalendarWithTime({
@@ -32,55 +40,56 @@ export function CalendarWithTime({
   onEndTimeChange,
   minDate,
   maxDate,
+  availableTimeSlots,
 }: CalendarWithTimeProps) {
   return (
-    <Card size="sm" className="mx-auto w-full">
-      <CardContent>
-        <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={onDateChange}
-          disabled={(date) => {
-            if (minDate && date < minDate) return true;
-            if (maxDate && date > maxDate) return true;
-            return false;
-          }}
-          className="p-0"
-        />
+    <Card size="sm" className="mx-auto w-full max-w-md">
+      <CardContent className="flex justify-center p-0 py-4">
+        <div className="w-full flex justify-center">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={onDateChange}
+            disabled={(date) => {
+              if (minDate && date < minDate) return true;
+              if (maxDate && date > maxDate) return true;
+              return false;
+            }}
+            className="p-0 mx-auto"
+          />
+        </div>
       </CardContent>
-      <CardFooter className="border-t bg-card flex-col gap-4">
+      <CardFooter className="border-t bg-card flex-col gap-4 p-6">
         <FieldGroup>
           <Field>
             <FieldLabel htmlFor="time-from">Start Time</FieldLabel>
-            <InputGroup>
-              <InputGroupInput
-                id="time-from"
-                type="time"
-                step="1"
-                value={selectedStartTime}
-                onChange={(e) => onStartTimeChange(e.target.value)}
-                className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-              />
-              <InputGroupAddon>
-                <Clock2Icon className="text-muted-foreground" />
-              </InputGroupAddon>
-            </InputGroup>
+            <Select value={selectedStartTime} onValueChange={onStartTimeChange}>
+              <SelectTrigger id="time-from" className="w-full border-2 border-foreground h-12 font-bold">
+                <SelectValue placeholder="Select start time" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableTimeSlots.map((slot) => (
+                  <SelectItem key={`start-${slot}`} value={slot}>
+                    {slot}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </Field>
           <Field>
             <FieldLabel htmlFor="time-to">End Time</FieldLabel>
-            <InputGroup>
-              <InputGroupInput
-                id="time-to"
-                type="time"
-                step="1"
-                value={selectedEndTime}
-                onChange={(e) => onEndTimeChange(e.target.value)}
-                className="appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-              />
-              <InputGroupAddon>
-                <Clock2Icon className="text-muted-foreground" />
-              </InputGroupAddon>
-            </InputGroup>
+            <Select value={selectedEndTime} onValueChange={onEndTimeChange}>
+              <SelectTrigger id="time-to" className="w-full border-2 border-foreground h-12 font-bold">
+                <SelectValue placeholder="Select end time" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableTimeSlots.map((slot) => (
+                  <SelectItem key={`end-${slot}`} value={slot}>
+                    {slot}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </Field>
         </FieldGroup>
       </CardFooter>
