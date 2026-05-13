@@ -189,8 +189,15 @@ export default function Offer() {
           </div>
 
           {subscriptionPoster && (
-            <div className="rrp-offer-poster">
-              <img src={subscriptionPoster.src} alt={subscriptionPoster.alt} loading="lazy" />
+            <div 
+              className="rrp-offer-poster"
+              style={{
+                backgroundImage: `url('${subscriptionPoster.src}')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+              }}
+            >
             </div>
           )}
 
